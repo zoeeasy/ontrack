@@ -1,1 +1,1 @@
-var releases = ['2.25.2'];
+var releases = ['2.26.0'];
