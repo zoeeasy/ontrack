@@ -1,1 +1,1 @@
-var releases = ['3.0-beta.13','3.0-alpha.3','2.26.6'];
+var releases = ['3.0-beta.14','2.26.6'];
