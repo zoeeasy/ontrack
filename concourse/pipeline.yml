@@ -1,19 +1,19 @@
 # fly -t local set-pipeline -p ontrack -c concourse/pipeline.yml -l concourse/parameters.yml -l concourse/secrets.yml
 
 resources:
-  - name: code
+  - name: repo-code
     type: git
     source:
         uri: ((github-repo))
         branch: ((branch))
         ignore_paths: ["concourse/images/*"]
-  - name: images-code
+  - name: repo-images
     type: git
     source:
         uri: ((github-repo))
         branch: ((branch))
         paths: ["concourse/images/*"]
-  - name: ontrack-ci-image
+  - name: image-ontrack-ci
     type: docker-image
     source:
       repository: ((docker-hub-organization))/ontrack-ci-image
@@ -24,14 +24,14 @@ resources:
 jobs:
   - name: build-images
     plan:
-    - get: images-code
-    - put: ontrack-ci-image
+    - get: repo-images
+    - put: image-ontrack-ci
       params:
         build: images-code/concourse/images/ci
   - name: build
     plan:
-      - get: ontrack-ci-image
-      - get: code
+      - get: image-ontrack-ci
+      - get: repo-code
       - task: build
-        image: ontrack-ci-image
+        image: image-ontrack-ci
         file: code/concourse/tasks/build.yml

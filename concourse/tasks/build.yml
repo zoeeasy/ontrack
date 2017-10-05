@@ -1,13 +1,7 @@
 platform: linux
 
-image_resource:
-  type: docker-image
-  source:
-    repository: code
-    tag: 8-jdk
-
 inputs:
-  - name: code
+  - name: repo-code
 
 run:
-  path: code/concourse/scripts/build.sh
+  path: repo-code/concourse/scripts/build.sh
