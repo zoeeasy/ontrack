@@ -10,4 +10,4 @@ inputs:
   - name: code
 
 run:
-  path: code/concourse/task-build.sh
+  path: code/concourse/scripts/build.sh

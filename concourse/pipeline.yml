@@ -34,4 +34,4 @@ jobs:
       - get: code
       - task: build
         image: ontrack-ci-image
-        file: code/concourse/task-build.yml
+        file: code/concourse/tasks/build.yml
