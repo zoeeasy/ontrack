@@ -30,7 +30,7 @@ jobs:
         build: code/concourse/images/ci
   - name: build
     plan:
-      - get: build-images
+      - get: ontrack-ci-image
       - get: code
       - task: build
         image: ontrack-ci-image
