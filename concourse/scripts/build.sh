@@ -8,6 +8,7 @@ pushd repo-code
         versionDisplay \
         versionFile \
         test \
+        integrationTest \
         build \
         -PbowerOptions='--allow-root' \
         -Dorg.gradle.jvmargs=-Xmx1536m \
