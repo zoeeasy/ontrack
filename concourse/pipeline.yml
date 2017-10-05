@@ -25,16 +25,13 @@ jobs:
   - name: build-images
     plan:
     - get: images-code
-      trigger: true
     - put: ontrack-ci-image
       params:
         build: images-code/concourse/images/ci
   - name: build
     plan:
       - get: ontrack-ci-image
-        trigger: true
       - get: code
-        trigger: true
       - task: build
         image: ontrack-ci-image
         file: code/concourse/task-build.yml
