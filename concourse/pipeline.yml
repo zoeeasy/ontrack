@@ -10,7 +10,7 @@ resources:
   - name: images-code
     type: git
     source:
-        uri: https://github.com/nemerosa/ontrack
+        uri: ((github-repo))
         branch: ((branch))
         paths: ["concourse/images/*"]
   - name: ontrack-ci-image
