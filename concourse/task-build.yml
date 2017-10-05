@@ -1,0 +1,13 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: openjdk
+    tag: 8-jdk
+
+inputs:
+  - name: ontrack
+
+run:
+  path: ontrack/concourse/task-build.sh
