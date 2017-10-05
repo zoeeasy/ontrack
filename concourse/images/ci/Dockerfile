@@ -9,3 +9,7 @@ RUN apt-get update && apt-get install -y \
     iceweasel \
     graphviz \
     && rm -rf /var/lib/apt/lists/*
+
+# Git configuration
+RUN git config --global user.email "ci@nemerosa.net" \
+    && git config --global user.name "CI"
