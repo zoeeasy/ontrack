@@ -7,7 +7,7 @@ image_resource:
     tag: 8-jdk
 
 inputs:
-  - name: ontrack
+  - name: code
 
 run:
-  path: ontrack/concourse/task-build.sh
+  path: code/concourse/task-build.sh

@@ -1,5 +1,5 @@
 resources:
-  - name: ontrack
+  - name: code
     type: git
     source:
         uri: https://github.com/nemerosa/ontrack
@@ -8,6 +8,6 @@ resources:
 jobs:
   - name: build
     plan:
-      - get: ontrack
+      - get: code
       - task: build
-        file: ontrack/concourse/task-build.yml
+        file: code/concourse/task-build.yml
