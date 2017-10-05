@@ -1,3 +1,4 @@
 github-repo: "https://github.com/nemerosa/ontrack.git"
 docker-hub-organization: "nemerosa"
 branch: "experimental/concourse"
+docker-hub-tag: "experimental-concourse"

@@ -19,7 +19,7 @@ resources:
       repository: ((docker-hub-organization))/ontrack-ci-image
       username: ((docker-hub-username))
       password: ((docker-hub-password))
-      tag: ((branch))
+      tag: ((docker-hub-tag))
 
 jobs:
   - name: build-images
