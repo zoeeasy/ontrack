@@ -25,12 +25,15 @@ jobs:
   - name: build-images
     plan:
     - get: repo-images
+      trigger: true
     - put: image-ontrack-ci
       params:
         build: images-code/concourse/images/ci
-  - name: build
+  - name: package
     plan:
       - get: image-ontrack-ci
+        trigger: true
+        passed: [build-images]
       - get: repo-code
       - task: build
         image: image-ontrack-ci
