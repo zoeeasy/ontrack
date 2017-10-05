@@ -27,7 +27,7 @@ jobs:
     - get: images-code
     - put: ontrack-ci-image
       params:
-        build: code/concourse/images/ci
+        build: images-code/concourse/images/ci
   - name: build
     plan:
       - get: ontrack-ci-image
