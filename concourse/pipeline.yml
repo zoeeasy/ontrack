@@ -35,6 +35,7 @@ jobs:
         trigger: true
         passed: [build-images]
       - get: repo-code
+        trigger: true
       - task: build
         image: image-ontrack-ci
         file: repo-code/concourse/tasks/build.yml
