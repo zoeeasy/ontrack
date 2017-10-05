@@ -2,7 +2,7 @@
 
 set -e -x
 
-pushd code
+pushd repo-code
     ./gradlew \
         clean \
         versionDisplay \

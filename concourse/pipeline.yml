@@ -28,7 +28,7 @@ jobs:
       trigger: true
     - put: image-ontrack-ci
       params:
-        build: images-code/concourse/images/ci
+        build: repo-images/concourse/images/ci
   - name: package
     plan:
       - get: image-ontrack-ci
@@ -37,4 +37,4 @@ jobs:
       - get: repo-code
       - task: build
         image: image-ontrack-ci
-        file: code/concourse/tasks/build.yml
+        file: repo-code/concourse/tasks/build.yml
