@@ -3,7 +3,7 @@ resources:
     type: git
     source:
         uri: https://github.com/nemerosa/ontrack
-        branch: master
+        branch: experimental/concourse
 
 jobs:
   - name: build
