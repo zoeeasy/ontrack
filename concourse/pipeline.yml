@@ -1,13 +1,37 @@
+# fly -t local set-pipeline -p ontrack -c concourse/pipeline.yml -l concourse/parameters.yml -l concourse/secrets.yml
+
 resources:
   - name: code
     type: git
     source:
+        uri: ((github-repo))
+        branch: ((branch))
+        ignore_paths: ["concourse/images/*"]
+  - name: images-code
+    type: git
+    source:
         uri: https://github.com/nemerosa/ontrack
-        branch: experimental/concourse
+        branch: ((branch))
+        paths: ["concourse/images/*"]
+  - name: ontrack-ci-image
+    type: docker-image
+    source:
+      repository: ((docker-hub-organization))/ontrack-ci-image
+      username: ((docker-hub-username))
+      password: ((docker-hub-password))
+      tag: ((branch))
 
 jobs:
+  - name: build-images
+    plan:
+    - get: images-code
+    - put: ontrack-ci-image
+      params:
+        build: code/concourse/images/ci
   - name: build
     plan:
+      - get: build-images
       - get: code
       - task: build
+        image: ontrack-ci-image
         file: code/concourse/task-build.yml
