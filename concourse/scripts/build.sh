@@ -12,6 +12,7 @@ pushd repo-code
         build \
         -PbowerOptions='--allow-root' \
         -Dorg.gradle.jvmargs=-Xmx1536m \
+        -Pdocumentation \
         --info \
         --stacktrace \
         --profile \
