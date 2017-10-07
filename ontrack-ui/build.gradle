@@ -114,3 +114,19 @@ springBoot {
     // Allowing the declaration of external extensions, packaged using the Spring Boot Module format
     layout = 'ZIP'
 }
+
+/**
+ * Publication
+ */
+
+publishing {
+    publications {
+        mavenCustom(MavenPublication) {
+            artifacts = [
+                    artifact("${buildDir}/libs/${project.name}-${project.version}.jar") {
+                            builtBy(bootRepackage)
+                        }
+            ]
+        }
+    }
+}
