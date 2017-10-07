@@ -82,8 +82,15 @@ jar {
 publishing {
     publications {
         mavenCustom(MavenPublication) {
-            // Clears all previous artifacts defined in root `build.gradle`
-            artifacts = [testJar]
+            artifacts = [
+                    artifact("${buildDir}/libs/${project.name}-${project.version}-app.jar") {
+                        builtBy(bootRepackage)
+                        classifier = 'app'
+                    },
+                    artifact(testJar) {
+                        classifier = null
+                    }
+            ]
         }
     }
 }
