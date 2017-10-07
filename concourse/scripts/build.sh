@@ -12,6 +12,7 @@ pushd repo-code
         test \
         integrationTest \
         build \
+        publish \
         -PbowerOptions='--allow-root' \
         -Dorg.gradle.jvmargs=-Xmx1536m \
         -Pdocumentation \
