@@ -97,7 +97,7 @@ configure(javaProjects) {
     publishing {
         repositories {
             maven {
-                url "${rootProject.buildDir}/repo"
+                url rootProject.properties['delivery.repository'] ?: "${rootProject.buildDir}/repo"
             }
         }
         publications {

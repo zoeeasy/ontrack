@@ -2,6 +2,8 @@
 
 set -e -x
 
+repository=$(pwd)/delivery-repository
+
 pushd repo-code
     ./gradlew \
         clean \
@@ -13,6 +15,7 @@ pushd repo-code
         -PbowerOptions='--allow-root' \
         -Dorg.gradle.jvmargs=-Xmx1536m \
         -Pdocumentation \
+        -Pdelivery.repository=${repository} \
         --info \
         --stacktrace \
         --profile \
