@@ -26,6 +26,17 @@ bootRepackage {
     classifier = 'executable'
 }
 
+publishing {
+    publications {
+        mavenCustom(MavenPublication) {
+            artifact("${buildDir}/libs/${project.name}-${project.version}-executable.jar") {
+                classifier = 'executable'
+                builtBy(bootRepackage)
+            }
+        }
+    }
+}
+
 rootProject.tasks.publicationPackage {
     from bootRepackage
 }

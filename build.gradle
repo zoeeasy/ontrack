@@ -95,6 +95,11 @@ configure(javaProjects) {
     // POM file
 
     publishing {
+        repositories {
+            maven {
+                url "${rootProject.buildDir}/repo"
+            }
+        }
         publications {
             mavenCustom(MavenPublication) {
                 from components.java
