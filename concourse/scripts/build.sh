@@ -17,7 +17,6 @@ pushd repo-code
         -Dorg.gradle.jvmargs=-Xmx1536m \
         -Pdocumentation \
         -Pdelivery.repository=${repository} \
-        --info \
         --stacktrace \
         --profile \
         --console plain
