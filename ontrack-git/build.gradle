@@ -8,6 +8,18 @@ dependencies {
     compile 'commons-io:commons-io'
     compile 'com.google.guava:guava'
     compile project(':ontrack-common')
-    compile 'org.codehaus.groovy:groovy-all'
     compile 'org.slf4j:slf4j-api'
+
+    testCompile 'org.codehaus.groovy:groovy-all'
+}
+
+task testJar(type: Jar) {
+    classifier = 'tests'
+    from sourceSets.test.output
+}
+
+assemble.dependsOn testJar
+
+artifacts {
+    archives testJar
 }

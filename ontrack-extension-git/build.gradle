@@ -14,6 +14,7 @@ dependencies {
     testCompile project(':ontrack-it-utils')
     testCompile project(':ontrack-extension-issues').sourceSets.test.output
     testCompile project(':ontrack-ui-graphql').sourceSets.test.output
+    testCompile project(':ontrack-git').sourceSets.test.output
     testCompile 'org.codehaus.groovy:groovy-all'
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')
