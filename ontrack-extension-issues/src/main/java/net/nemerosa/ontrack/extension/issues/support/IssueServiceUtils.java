@@ -74,7 +74,7 @@ public final class IssueServiceUtils {
                     throw new IssueExportMoreThanOneGroupException(issue.getKey(), issueGroups);
                 } else if (issueGroups.isEmpty()) {
                     if (groupingSpecification.isEmpty()) {
-                        targetGroup = IssueExportService.NO_GROUP;
+                        targetGroup = IssueExportService.Companion.getNO_GROUP();
                     } else {
                         targetGroup = request.getAltGroup();
                     }
