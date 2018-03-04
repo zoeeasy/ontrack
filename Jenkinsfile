@@ -68,6 +68,7 @@ git clean -xfd
     publishToMavenLocal \\
     osPackages \\
     dockerLatest \\
+    --parallel \\
     -Pdocumentation \\
     -PbowerOptions='--allow-root' \\
     -Dorg.gradle.jvmargs=-Xmx2048m \\
