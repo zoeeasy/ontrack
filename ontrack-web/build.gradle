@@ -1,9 +1,12 @@
 buildscript {
     repositories {
         jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
-        classpath 'com.moowork.gradle:gradle-node-plugin:0.11'
+        classpath 'com.moowork.gradle:gradle-node-plugin:1.2.0'
     }
 }
 
@@ -14,10 +17,23 @@ apply plugin: 'com.moowork.node'
 
 // Node environment
 
+ext {
+    nodeDir = project.file("${project.buildDir}")
+}
+
 node {
     version = '4.2.2'
-    npmVersion = '4.2.2'
+    npmVersion = '2.14.7'
     download = true
+
+    // Set the work directory for unpacking node
+    workDir = project.file("${project.buildDir}/nodejs")
+
+    // Set the work directory for NPM
+    npmWorkDir = project.file("${project.buildDir}/npm")
+
+    // Set the work directory where node_modules should be located
+    nodeModulesDir = project.nodeDir
 }
 
 // Environment
@@ -26,26 +42,9 @@ ext {
     cacheDir = gradle.getGradleUserHomeDir() as String ?: "${System.getProperty("user.home")}/.cache/gradle"
 }
 
-task npmCacheConfig(type: NpmTask) {
-    description = "Configure the NPM cache"
-    def npmCacheDir = "${cacheDir}/caches/npm"
-    outputs.files file(npmCacheDir)
-    args = [ 'config', 'set', 'cache', npmCacheDir ]
-}
-
-task npmPackages(type: NpmTask, dependsOn: npmCacheConfig) {
-    description = "Install Node.js packages"
-    args = [ 'install' ]
-    inputs.files file('package.json')
-    outputs.files file('node_modules')
-}
-
-task bowerInstall(type: NodeTask, dependsOn: npmPackages) {
+task bowerInstall(type: NodeTask, dependsOn: 'npm_install') {
     script = file('node_modules/bower/bin/bower')
-    def bowerArgs = ["--config.storage.cache=${cacheDir}/caches/bower/cache",
-                     "--config.storage.packages=${cacheDir}/caches/bower/packages",
-                     "--config.storage.registry=${cacheDir}/caches/bower/registry",
-                     'install']
+    def bowerArgs = ['install']
     if (project.properties.bowerOptions) {
         bowerArgs.add(project.properties.bowerOptions as String)
     }
