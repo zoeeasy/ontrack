@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.neo4j
 
-import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.neo4j.model.Neo4JExportModule
 import net.nemerosa.ontrack.extension.neo4j.model.Neo4JExportRecordDef
 import net.nemerosa.ontrack.extension.neo4j.model.Neo4JExportRecordExtractor
+import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.model.security.ApplicationManagement
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.callAsAdmin
@@ -12,7 +12,6 @@ import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.model.support.EnvService
 import org.apache.commons.io.FileUtils
-import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.io.File
@@ -35,7 +34,7 @@ class Neo4JExportServiceImpl(
      */
     private val currentExportContext = AtomicReference<Neo4JExportContext>()
 
-    override fun export(input: Neo4JExportInput): Neo4JExportOutput {
+    override fun export(listener: JobRunListener) {
 
         // Checks authorizations
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
@@ -62,17 +61,6 @@ class Neo4JExportServiceImpl(
         // Launching the export
         securityService.asAdmin { export(exportContext, recordDefinitions) }
 
-        // Gets list of paths
-        val paths = exportContext.paths
-
-        // OK
-        return Neo4JExportOutput(
-                exportContext.uuid,
-                // Nodes
-                paths.filter { p -> StringUtils.startsWith(p, "node/") },
-                // Relationships
-                paths.filter { p -> StringUtils.startsWith(p, "rel/") }
-        )
     }
 
     private fun export(exportContext: Neo4JExportContext, recordExtractors: List<Neo4JExportRecordExtractor<*>>) {
@@ -110,7 +98,7 @@ class Neo4JExportServiceImpl(
                                 ""
                         )
                                 .withDetail("neo4j.export.uuid", ctx.uuid)
-                                .withDetail("neo4j.export.dir", contextWorkingDir.getAbsolutePath())
+                                .withDetail("neo4j.export.dir", contextWorkingDir.absolutePath)
                 )
             }
 
@@ -125,9 +113,5 @@ class Neo4JExportServiceImpl(
 
     private fun getContextWorkingDir(id: String): File =
             envService.getWorkingDir(configProperties.exportDownloadPath, id)
-
-    override fun download(uuid: String): Document {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
 }

@@ -1,36 +1,26 @@
 package net.nemerosa.ontrack.extension.neo4j
 
-import org.springframework.web.bind.annotation.*
-import java.util.concurrent.Callable
-import javax.servlet.http.HttpServletResponse
-
+import net.nemerosa.ontrack.job.JobScheduler
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/extension/neo4j/export")
 class Neo4JExportController(
-        private val neo4JExportService: Neo4JExportService
+        private val jobScheduler: JobScheduler
 ) {
 
     /**
      * Launching the export in async mode
      */
     @PostMapping
-    fun launchExport(@RequestBody input: Neo4JExportInput): Callable<Neo4JExportOutput> =
-            Callable { neo4JExportService.export(input) }
-
-
-    /**
-     * Download
-     */
-    @GetMapping("{uuid}")
-    fun download(@PathVariable uuid: String, response: HttpServletResponse) {
-        val document = neo4JExportService.download(uuid)
-        response.contentType = document.type
-        val bytes = document.content
-        response.setContentLength(bytes.size)
-        response.setHeader("Content-Disposition", "attachment; filename=neo4j.zip")
-        response.outputStream.write(bytes)
-        response.outputStream.flush()
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun launchExport() {
+        jobScheduler.fireImmediately(Neo4JJob.NEO4J_EXPORT_JOB)
     }
+
 
 }

@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.extension.neo4j
 
-import net.nemerosa.ontrack.common.Document
+import net.nemerosa.ontrack.job.JobRunListener
 
 interface Neo4JExportService {
-    fun export(input: Neo4JExportInput): Neo4JExportOutput
-    fun download(uuid: String): Document
+    fun export(listener: JobRunListener)
 }
