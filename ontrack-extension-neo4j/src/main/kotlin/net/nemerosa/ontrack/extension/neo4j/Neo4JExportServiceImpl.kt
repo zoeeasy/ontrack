@@ -31,6 +31,8 @@ class Neo4JExportServiceImpl(
 ) : Neo4JExportService {
     /**
      * Download context
+     *
+     * TODO Closes it on download
      */
     private val currentExportContext = AtomicReference<Neo4JExportContext>()
 
@@ -39,12 +41,24 @@ class Neo4JExportServiceImpl(
         // Checks authorizations
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
 
+        /*
+         * If the current context is present and if it is not ready for download,
+         * the new export request is rejected.
+         *
+         * If it is present, and if it ready for download,
+         * the previous request is cancelled and a new one is created.
+         */
+
         // Cleanup of previous context
         val exportContext = currentExportContext.updateAndGet { ctx ->
-            closeContext(ctx)
-            // New context
-            val uuid = UUID.randomUUID().toString()
-            createExportContext(uuid)
+            if (ctx != null && ctx.state != Neo4JExportContextState.READY) {
+                throw Neo4JExportAlreadyRunningException()
+            } else {
+                closeContext(ctx)
+                // New context
+                val uuid = UUID.randomUUID().toString()
+                createExportContext(uuid)
+            }
         }
 
         // Initialisation of the context

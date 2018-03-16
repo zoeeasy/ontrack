@@ -7,12 +7,34 @@ import java.io.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Consumer
 
-open class Neo4JExportContext(
+open class Neo4JExportContext
+private constructor(
         val uuid: String,
-        val dir: File
+        val dir: File,
+        val state: Neo4JExportContextState,
+        private val records: ConcurrentHashMap<String, RecordFile>
 ) : Closeable {
 
-    private val records = ConcurrentHashMap<String, RecordFile>()
+    constructor(uuid: String, dir: File) : this(
+            uuid,
+            dir,
+            Neo4JExportContextState.CREATED,
+            ConcurrentHashMap<String, RecordFile>()
+    )
+
+    fun start() = Neo4JExportContext(
+            uuid,
+            dir,
+            Neo4JExportContextState.RUNNING,
+            records
+    )
+
+    fun ready() = Neo4JExportContext(
+            uuid,
+            dir,
+            Neo4JExportContextState.READY,
+            records
+    )
 
     val paths: List<String>
         get() = records.values
