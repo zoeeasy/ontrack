@@ -1,3 +1,15 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ontrack-v2-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,9 +28,16 @@ spec:
         app: "ontrack"
         major: "2"
     spec:
+      volumes:
+        - name: ontrack-v2-storage
+          persistentVolumeClaim:
+            claimName: ontrack-v2-pvc
       containers:
         - name: ontrack
           image: "nemerosa/ontrack:2.33.5"
+          volumeMounts:
+            - mountPath: /var/ontrack/data
+              name: ontrack-v2-storage
           ports:
             - containerPort: 8080
               name: http
