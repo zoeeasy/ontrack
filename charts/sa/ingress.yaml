@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ontrack-v2-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: ontrack.local
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: ontrack-v2-service
+              servicePort: 8080
