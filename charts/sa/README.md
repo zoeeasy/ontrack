@@ -1,3 +1,5 @@
+## Deploying Ontrack V2 on Minikube
+
 Creating a namespace:
 
     kubectl create namespace test
@@ -11,14 +13,14 @@ Enabling the Ingress mode in Minikube:
 
     minikube addons enable ingress
 
+Change the host name in `ingress.yaml` using an address like
+
+    ontrack.$(minikube ip).nip.io
+
 Registering the ingress:
 
     kubectl create --namespace test -f ingress.yaml
 
-Adding the host in the local `/etc/hosts`:
-
-    echo "$(minikube ip) ontrack.local" | sudo tee -a /etc/hosts
-
 Service is now available:
 
-    curl -v http://ontrack.local
+    curl -v http://ontrack.$(minikube ip).nip.io

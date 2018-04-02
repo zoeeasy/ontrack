@@ -6,7 +6,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - host: ontrack.local
+    - host: ontrack.192.168.64.11.nip.io
       http:
         paths:
           - path: /
