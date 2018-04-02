@@ -24,3 +24,11 @@ Registering the ingress:
 Service is now available:
 
     curl -v http://ontrack.$(minikube ip).nip.io
+
+## Upgrading the version of Ontrack
+
+Upgrading the image:
+
+    kubectl --namespace test set image deployment/ontrack-v2-deployment ontrack=nemerosa/ontrack:2.34.6
+
+After a while, the new version is available and the old one has been discarded.
