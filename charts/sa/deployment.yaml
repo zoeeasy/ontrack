@@ -22,6 +22,8 @@ spec:
     matchLabels:
       app: "ontrack"
       major: "2"
+  strategy:
+      type: Recreate
   template:
     metadata:
       labels:
