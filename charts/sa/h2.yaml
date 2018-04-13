@@ -15,23 +15,17 @@ kind: Deployment
 metadata:
   name: ontrack-h2-deployment
   labels:
-    app: "ontrack"
-    major: "2"
-    tier: "backend"
+    app: "h2"
 spec:
   selector:
     matchLabels:
-      app: "ontrack"
-      major: "2"
-      tier: "backend"
+      app: "h2"
   strategy:
       type: Recreate
   template:
     metadata:
       labels:
-        app: "ontrack"
-        major: "2"
-        tier: "backend"
+        app: "h2"
     spec:
       volumes:
         - name: ontrack-h2-storage
@@ -50,3 +44,18 @@ spec:
             - containerPort: 8082
               name: console
               protocol: TCP
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "ontrack-h2-deployment-service"
+  labels:
+    app: "h2"
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 9082
+    targetPort: 9082
+  selector:
+    app: "h2"
+  clusterIP: None
