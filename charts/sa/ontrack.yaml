@@ -36,7 +36,10 @@ spec:
             claimName: ontrack-v2-pvc
       containers:
         - name: ontrack
-          image: "nemerosa/ontrack:2.33.5"
+          image: "nemerosa/ontrack:2.34.8"
+          env:
+            - name: ONTRACK_DB_URL
+              value: "jdbc:h2:tcp://ontrack-h2-deployment-service:9082/ontrack;MODE=MYSQL"
           volumeMounts:
             - mountPath: /var/ontrack/data
               name: ontrack-v2-storage
@@ -44,11 +47,29 @@ spec:
             - containerPort: 8080
               name: http
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              port: http
-              path: /info
-          readinessProbe:
-            httpGet:
-              port: http
-              path: /info
+#          livenessProbe:
+#            httpGet:
+#              port: http
+#              path: /info
+#          readinessProbe:
+#            httpGet:
+#              port: http
+#              path: /info
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ontrack-v2-service
+  labels:
+    app: "ontrack"
+    major: "2"
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: "ontrack"
+    major: "2"
