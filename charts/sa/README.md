@@ -1,4 +1,9 @@
-## Deploying Ontrack V2 on Minikube
+## Deploying on GCE
+
+    kubectl create -f h2.yaml
+    kubectl create -f ontrack.yaml
+
+## TODO Deploying Ontrack V2 on Minikube
 
 Creating a namespace:
 
@@ -25,7 +30,7 @@ Service is now available:
 
     curl -v http://ontrack.$(minikube ip).nip.io
 
-## Upgrading the version of Ontrack
+### TODO Upgrading the version of Ontrack
 
 Upgrading the image:
 
