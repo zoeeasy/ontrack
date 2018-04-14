@@ -13,4 +13,4 @@ ontrack:
     size: 2Gi
   image:
     repository: nemerosa/ontrack
-    version: 2.33.5
+    version: 2.33.4
