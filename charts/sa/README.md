@@ -1,7 +1,6 @@
 ## Deploying
 
     kubectl create namespace test
-    kubectl apply --namespace test -f h2.yaml
     kubectl apply --namespace test -f ontrack.yaml
 
 ## Deploying on Minikube
@@ -9,7 +8,6 @@
 To open in a browser:
 
     minikube service --namespace test ontrack-v2-service
-
 
 Or to get its URL:
 
