@@ -108,14 +108,14 @@ spec:
             - containerPort: 8080
               name: http
               protocol: TCP
-#          livenessProbe:
-#            httpGet:
-#              port: http
-#              path: /info
-#          readinessProbe:
-#            httpGet:
-#              port: http
-#              path: /info
+          livenessProbe:
+            httpGet:
+              port: http
+              path: /info
+          readinessProbe:
+            httpGet:
+              port: http
+              path: /info
 ---
 apiVersion: v1
 kind: Service
