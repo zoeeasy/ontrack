@@ -70,54 +70,64 @@ spec:
     release: {{ .Release.Name }}
   clusterIP: None
 ---
-#apiVersion: v1
-#kind: PersistentVolumeClaim
-#metadata:
-#  name: ontrack-v2-pvc
-#spec:
-#  accessModes:
-#    - ReadWriteOnce
-#  resources:
-#    requests:
-#      storage: 2Gi
-#---
-#apiVersion: apps/v1
-#kind: Deployment
-#metadata:
-#  name: ontrack-v2-deployment
-#  labels:
-#    app: "ontrack"
-#    major: "2"
-#spec:
-#  selector:
-#    matchLabels:
-#      app: "ontrack"
-#      major: "2"
-#  strategy:
-#      type: Recreate
-#  template:
-#    metadata:
-#      labels:
-#        app: "ontrack"
-#        major: "2"
-#    spec:
-#      volumes:
-#        - name: ontrack-v2-storage
-#          persistentVolumeClaim:
-#            claimName: ontrack-v2-pvc
-#      containers:
-#        - name: ontrack
-#          image: "nemerosa/ontrack:2.34.8"
-#          env:
-#            - name: ONTRACK_DB_URL
-#              value: "jdbc:h2:tcp://ontrack-h2-deployment-service:9082/ontrack;MODE=MYSQL"
-#          volumeMounts:
-#            - mountPath: /var/ontrack/data
-#              name: ontrack-v2-storage
-#          ports:
-#            - containerPort: 8080
-#              name: http
-#              protocol: TCP
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-v2-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.ontrack.disk.size | quote }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-v2-deployment
+  labels:
+    app: "ontrack"
+    major: "2"
+    chart: {{ template "ontrack.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  selector:
+    matchLabels:
+      app: "ontrack"
+      major: "2"
+      release: {{ .Release.Name }}
+  strategy:
+      type: Recreate
+  template:
+    metadata:
+      labels:
+        app: "ontrack"
+        major: "2"
+        release: {{ .Release.Name }}
+    spec:
+      volumes:
+        - name: {{ .Release.Name }}-v2-storage
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-v2-pvc
+      containers:
+        - name: {{ .Chart.Name }}-ontrack
+          image: "{{ .Values.ontrack.image.repository }}:{{ .Values.ontrack.image.version }}"
+          resources:
+            limits:
+              memory: "1Gi"
+          env:
+            - name: ONTRACK_DB_URL
+              value: "jdbc:h2:tcp://{{ .Release.Name }}-h2-deployment-service:9082/ontrack;MODE=MYSQL"
+            - name: JAVA_OPTIONS
+              value: "-Xmx1024m -Xms1024m"
+          volumeMounts:
+            - mountPath: /var/ontrack/data
+              name: {{ .Release.Name }}-v2-storage
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
 #          livenessProbe:
 #            httpGet:
 #              port: http
@@ -126,7 +136,7 @@ spec:
 #            httpGet:
 #              port: http
 #              path: /info
-#---
+---
 #apiVersion: v1
 #kind: Service
 #metadata:

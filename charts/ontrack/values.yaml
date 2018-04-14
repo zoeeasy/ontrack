@@ -8,3 +8,9 @@ h2:
   image:
     repository: nemerosa/h2
     version: 0.1.0
+ontrack:
+  disk:
+    size: 2Gi
+  image:
+    repository: nemerosa/ontrack
+    version: 2.33.5
