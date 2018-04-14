@@ -1,18 +1,10 @@
-## Deploying on GCE
-
-    kubectl create -f h2.yaml
-    kubectl create -f ontrack.yaml
-
-## Deploying on Minikube
-
-Creating a namespace:
+## Deploying
 
     kubectl create namespace test
+    kubectl apply --namespace test -f h2.yaml
+    kubectl apply --namespace test -f ontrack.yaml
 
-Deploying:
-
-    kubectl create --namespace test -f h2.yaml
-    kubectl create --namespace test -f ontrack.yaml
+## Deploying on Minikube
 
 To open in a browser:
 
@@ -23,6 +15,10 @@ Or to get its URL:
 
     minikube service --namespace test --url ontrack-v2-service
 
-## TODOs
+## Upgrading the version of Ontrack
 
-* Upgrading the version of Ontrack
+Change the Ontrack version in `ontrack.yml`.
+
+Redeploy:
+
+    kubectl apply --namespace test -f ontrack.yaml

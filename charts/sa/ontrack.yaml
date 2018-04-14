@@ -36,7 +36,7 @@ spec:
             claimName: ontrack-v2-pvc
       containers:
         - name: ontrack
-          image: "nemerosa/ontrack:2.33.5"
+          image: "nemerosa/ontrack:2.34.8"
           env:
             - name: ONTRACK_DB_URL
               value: "jdbc:h2:tcp://ontrack-h2-deployment-service:9082/ontrack;MODE=MYSQL"
