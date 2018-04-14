@@ -1,0 +1,10 @@
+# Default values for Ontrack chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+h2:
+  disk:
+    size: 2Gi
+  image:
+    repository: nemerosa/h2
+    version: 0.1.0

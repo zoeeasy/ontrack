@@ -1,0 +1,9 @@
+name: ontrack
+version: 0.1.0
+description: A Helm chart for Ontrack
+keywords:
+  - ontrack
+  - cd
+engine: gotpl
+icon: https://raw.githubusercontent.com/nemerosa/ontrack/master/ontrack-web/src/assets/logo-128.png
+appVersion: "2.33.5"
