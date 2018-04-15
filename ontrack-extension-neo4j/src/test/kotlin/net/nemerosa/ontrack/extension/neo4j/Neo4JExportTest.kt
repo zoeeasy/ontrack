@@ -46,7 +46,7 @@ class Neo4JExportTest : AbstractDSLTestSupport() {
         val response = asAdmin().call {
             neo4JExportService.export(Neo4JExportRequest())
                     .toCompletableFuture()
-                    .get(10, TimeUnit.MINUTES)
+                    .get(10, TimeUnit.SECONDS)
         }
         // Summary
         response.stats.forEach { name, count ->
