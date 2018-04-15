@@ -40,6 +40,8 @@ class Neo4JExportServiceImpl(
     private val currentExportContext = AtomicReference<Neo4JExportContext>()
 
     override fun download(uuid: String, stream: OutputStream) {
+        // Checks authorizations
+        securityService.checkGlobalFunction(ApplicationManagement::class.java)
         // Gets the current context
         val exportContext: Neo4JExportContext? = currentExportContext.getAndSet(null)
         // If present
@@ -122,7 +124,9 @@ class Neo4JExportServiceImpl(
 
     private fun export(exportContext: Neo4JExportContext, recordExtractors: List<Neo4JExportRecordExtractor<*>>) {
         exportContext.start()
-        recordExtractors.forEach { recordExtractor -> export(exportContext, recordExtractor) }
+        securityService.callAsAdmin {
+            recordExtractors.forEach { recordExtractor -> export(exportContext, recordExtractor) }
+        }
         exportContext.ready()
     }
 
@@ -132,9 +136,7 @@ class Neo4JExportServiceImpl(
      */
     private fun <T> export(exportContext: Neo4JExportContext, recordExtractor: Neo4JExportRecordExtractor<T>) {
         // Gets the list of items
-        val items = securityService.callAsAdmin {
-            recordExtractor.collectionSupplier()
-        }
+        val items = recordExtractor.collectionSupplier()
         // Exports each items
         items.forEach { o -> export(exportContext, recordExtractor, o) }
     }
