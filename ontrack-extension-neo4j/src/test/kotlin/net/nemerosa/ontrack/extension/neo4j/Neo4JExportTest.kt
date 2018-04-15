@@ -4,8 +4,6 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import org.junit.Before
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.transaction.PlatformTransactionManager
-import org.springframework.transaction.support.TransactionTemplate
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
 
@@ -16,11 +14,6 @@ class Neo4JExportTest : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var neo4JExportService: Neo4JExportService
-
-    @Autowired
-    private lateinit var platformTransactionManager: PlatformTransactionManager
-
-    private lateinit var transactionTemplate: TransactionTemplate
 
     /**
      * Removing all data from Ontrack in order to start with a clean
@@ -33,13 +26,12 @@ class Neo4JExportTest : AbstractDSLTestSupport() {
                 structureService.deleteProject(it.id)
             }
         }
-        transactionTemplate = TransactionTemplate(platformTransactionManager)
     }
 
     @Test
     fun export() {
         // Creates projects, branches, etc.
-        transactionTemplate.execute {
+        tx {
             project {
                 branch("master") {}
                 branch("release/2.0") {}
