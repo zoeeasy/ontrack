@@ -113,7 +113,7 @@ private constructor(
     }
 
     fun recordStat(name: String, type: Neo4JExportRecordType) {
-        val key = "$type-$name"
+        val key = "${type.name.toLowerCase()}/$name"
         stats.compute(
                 key,
                 { _, value: Int? -> (value ?: 0) + 1 }
