@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 @Component
 class EntitiesNeo4JExportModule(
         private val structureService: StructureService
-): Neo4JExportModule {
+) : Neo4JExportModule {
     override val recordExtractors = extractors {
         extractor<Project> {
             records { structureService.projectList.asSequence() }
