@@ -19,10 +19,10 @@ class ExtractorsContext {
 }
 
 class ExtractorContext<T> {
-    private var items: () -> List<T> = { emptyList() }
+    private var items: () -> Sequence<T> = { emptySequence() }
     private val recordDefinitions = mutableListOf<Neo4JExportRecordDef<T>>()
 
-    fun records(items: () -> List<T>) {
+    fun records(items: () -> Sequence<T>) {
         this.items = items
     }
 

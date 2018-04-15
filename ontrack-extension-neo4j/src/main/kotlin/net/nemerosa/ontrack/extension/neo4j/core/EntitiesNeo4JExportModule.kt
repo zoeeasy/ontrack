@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.neo4j.core
 
 import net.nemerosa.ontrack.extension.neo4j.model.Neo4JExportModule
-import net.nemerosa.ontrack.extension.neo4j.model.Neo4JExportRecordExtractor
 import net.nemerosa.ontrack.extension.neo4j.model.extractors
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
@@ -14,7 +13,7 @@ class EntitiesNeo4JExportModule(
 ): Neo4JExportModule {
     override val recordExtractors = extractors {
         extractor<Project> {
-            records { structureService.projectList }
+            records { structureService.projectList.asSequence() }
             node("Project") {
                 id(Project::id)
                 column("name" to Project::getName)
@@ -25,7 +24,7 @@ class EntitiesNeo4JExportModule(
             }
         }
         extractor<Branch> {
-            records { structureService.projectList.flatMap { structureService.getBranchesForProject(it.id) } }
+            records { structureService.projectList.asSequence().flatMap { structureService.getBranchesForProject(it.id).asSequence() } }
             node("Branch") {
                 id(Branch::id)
                 column("name" to Branch::getName)
