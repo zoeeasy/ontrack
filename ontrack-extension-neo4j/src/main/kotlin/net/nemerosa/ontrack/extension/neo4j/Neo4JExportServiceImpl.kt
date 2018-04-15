@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.neo4j.model.Neo4JExportRecordExtractor
 import net.nemerosa.ontrack.model.security.ApplicationManagement
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.callAsAdmin
-import net.nemerosa.ontrack.model.security.functionAsAdmin
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.io.File
 import java.io.IOException
+import java.io.OutputStream
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionStage
@@ -33,10 +33,29 @@ class Neo4JExportServiceImpl(
 
     /**
      * Download context
-     *
-     * TODO Closes it on download
      */
     private val currentExportContext = AtomicReference<Neo4JExportContext>()
+
+    override fun download(uuid: String, stream: OutputStream) {
+        // Gets the current context
+        val exportContext: Neo4JExportContext? = currentExportContext.getAndSet(null)
+        // If present
+        if (exportContext != null) {
+            // Checks the UUID
+            if (uuid != exportContext.uuid) {
+                throw Neo4JExportDownloadNotFoundException(uuid)
+            }
+            // Checks the context state
+            if (exportContext.state != Neo4JExportContextState.READY) {
+                throw Neo4JExportDownloadNotReadyException(uuid)
+            }
+            // FIXME Zipping the context
+            // Closes the context when done
+            exportContext.close()
+        } else {
+            throw Neo4JExportNoDownloadException()
+        }
+    }
 
     override fun export(request: Neo4JExportRequest): CompletionStage<Neo4JExportResponse> {
 

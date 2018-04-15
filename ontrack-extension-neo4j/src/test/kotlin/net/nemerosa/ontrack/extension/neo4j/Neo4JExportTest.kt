@@ -57,6 +57,8 @@ class Neo4JExportTest : AbstractDSLTestSupport() {
             assertEquals(5, stats["node/Branch"])
             assertEquals(5, stats["rel/BRANCH_OF"])
         }
+        // TODO Downloads the result and unzips them on the go
+        // neo4JExportService.download(response.uuid)
     }
 
 }
