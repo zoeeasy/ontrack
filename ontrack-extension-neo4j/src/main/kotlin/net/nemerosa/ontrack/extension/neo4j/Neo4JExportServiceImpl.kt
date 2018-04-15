@@ -3,10 +3,10 @@ package net.nemerosa.ontrack.extension.neo4j
 import net.nemerosa.ontrack.extension.neo4j.model.Neo4JExportModule
 import net.nemerosa.ontrack.extension.neo4j.model.Neo4JExportRecordDef
 import net.nemerosa.ontrack.extension.neo4j.model.Neo4JExportRecordExtractor
-import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.model.security.ApplicationManagement
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.callAsAdmin
+import net.nemerosa.ontrack.model.security.functionAsAdmin
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional
 import java.io.File
 import java.io.IOException
 import java.util.*
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CompletionStage
 import java.util.concurrent.atomic.AtomicReference
 
 
@@ -29,6 +31,7 @@ class Neo4JExportServiceImpl(
         private val envService: EnvService,
         private val applicationLogService: ApplicationLogService
 ) : Neo4JExportService {
+
     /**
      * Download context
      *
@@ -36,7 +39,7 @@ class Neo4JExportServiceImpl(
      */
     private val currentExportContext = AtomicReference<Neo4JExportContext>()
 
-    override fun export(listener: JobRunListener) {
+    override fun export(request: Neo4JExportRequest): CompletionStage<Neo4JExportResponse> {
 
         // Checks authorizations
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
@@ -72,8 +75,16 @@ class Neo4JExportServiceImpl(
             exportModules.flatMap { exportModule -> exportModule.recordExtractors }
         }
 
-        // Launching the export
-        securityService.asAdmin { export(exportContext, recordDefinitions) }
+        // Launching the export in a separate thread, run by the admin user
+        val secureCall = securityService.functionAsAdmin { export(exportContext, recordDefinitions) }
+        return CompletableFuture
+                .runAsync { secureCall() }
+                .thenApply {
+                    Neo4JExportResponse(
+                            exportContext.uuid,
+                            exportContext.stats
+                    )
+                }
 
     }
 
@@ -81,21 +92,33 @@ class Neo4JExportServiceImpl(
         recordExtractors.forEach { recordExtractor -> export(exportContext, recordExtractor) }
     }
 
+    /**
+     * Gets the list of items defined by the [recordExtractor] and exports each of them
+     * using the list of [record definitions][Neo4JExportRecordExtractor.recordDefinitions].
+     */
     private fun <T> export(exportContext: Neo4JExportContext, recordExtractor: Neo4JExportRecordExtractor<T>) {
         // Gets the list of items
         recordExtractor.collectionSupplier().forEach { o -> export(exportContext, recordExtractor, o) }
     }
 
+    /**
+     * Exports an [item][o] using a given [extractor][recordExtractor].
+     */
     private fun <T> export(exportContext: Neo4JExportContext, recordExtractor: Neo4JExportRecordExtractor<T>, o: T) {
         recordExtractor.recordDefinitions.forEach { recordDef -> export(exportContext, recordDef, o) }
     }
 
-    private fun <T> export(exportContext: Neo4JExportContext, recordExtractor: Neo4JExportRecordDef<T>, o: T) {
+    /**
+     * Exports a given [item][o] using a [record definition][recordDef].
+     */
+    private fun <T> export(exportContext: Neo4JExportContext, recordDef: Neo4JExportRecordDef<T>, o: T) {
         exportContext.writeRow(
-                recordExtractor.name,
-                recordExtractor.columns
+                recordDef.name,
+                recordDef.columns
                         .map { (_, valueFn) -> valueFn(o) }
         )
+        // Upgrading the stats
+        exportContext.recordStat(recordDef.name, recordDef.type)
     }
 
     private fun closeContext(ctx: Neo4JExportContext?): Neo4JExportContext? {

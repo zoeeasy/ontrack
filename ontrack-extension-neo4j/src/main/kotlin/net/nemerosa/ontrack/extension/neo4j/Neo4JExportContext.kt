@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.neo4j
 
 import net.nemerosa.ontrack.extension.neo4j.model.Neo4JExportRecordDef
+import net.nemerosa.ontrack.extension.neo4j.model.Neo4JExportRecordType
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringEscapeUtils
 import java.io.*
@@ -12,28 +13,32 @@ private constructor(
         val uuid: String,
         val dir: File,
         val state: Neo4JExportContextState,
-        private val records: ConcurrentHashMap<String, RecordFile>
+        private val records: ConcurrentHashMap<String, RecordFile>,
+        val stats: ConcurrentHashMap<String, Int>
 ) : Closeable {
 
     constructor(uuid: String, dir: File) : this(
             uuid,
             dir,
             Neo4JExportContextState.CREATED,
-            ConcurrentHashMap<String, RecordFile>()
+            ConcurrentHashMap<String, RecordFile>(),
+            ConcurrentHashMap<String, Int>()
     )
 
     fun start() = Neo4JExportContext(
             uuid,
             dir,
             Neo4JExportContextState.RUNNING,
-            records
+            records,
+            stats
     )
 
     fun ready() = Neo4JExportContext(
             uuid,
             dir,
             Neo4JExportContextState.READY,
-            records
+            records,
+            stats
     )
 
     val paths: List<String>
@@ -105,6 +110,14 @@ private constructor(
     fun open(file: String): InputStream {
         val f = File(dir, file)
         return BufferedInputStream(FileInputStream(f))
+    }
+
+    fun recordStat(name: String, type: Neo4JExportRecordType) {
+        val key = "$type-$name"
+        stats.compute(
+                key,
+                { _, value: Int? -> (value ?: 0) + 1 }
+        )
     }
 
     data class RecordFile(
