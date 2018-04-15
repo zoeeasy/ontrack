@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.neo4j.model.Neo4JExportRecordExtractor
 import net.nemerosa.ontrack.model.security.ApplicationManagement
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.callAsAdmin
+import net.nemerosa.ontrack.model.security.functionAsAdmin
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
