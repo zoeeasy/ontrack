@@ -12,7 +12,7 @@ open class Neo4JExportContext
 private constructor(
         val uuid: String,
         val dir: File,
-        val state: Neo4JExportContextState,
+        var state: Neo4JExportContextState = Neo4JExportContextState.CREATED,
         private val records: ConcurrentHashMap<String, RecordFile>,
         val stats: ConcurrentHashMap<String, Int>
 ) : Closeable {
@@ -25,21 +25,13 @@ private constructor(
             ConcurrentHashMap<String, Int>()
     )
 
-    fun start() = Neo4JExportContext(
-            uuid,
-            dir,
-            Neo4JExportContextState.RUNNING,
-            records,
-            stats
-    )
+    fun start() {
+        state = Neo4JExportContextState.RUNNING
+    }
 
-    fun ready() = Neo4JExportContext(
-            uuid,
-            dir,
-            Neo4JExportContextState.READY,
-            records,
-            stats
-    )
+    fun ready() {
+        state = Neo4JExportContextState.READY
+    }
 
     val paths: List<String>
         get() = records.values
@@ -58,7 +50,7 @@ private constructor(
         return if (recordFile != null) {
             recordFile.writer
         } else {
-            throw IllegalStateException("No CSV writer has been initialized for " + name)
+            throw IllegalStateException("No CSV writer has been initialized for $name")
         }
     }
 

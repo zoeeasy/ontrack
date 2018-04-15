@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.model.support.EnvService
 import org.apache.commons.io.FileUtils
+import org.apache.commons.io.IOUtils
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.io.File
@@ -20,6 +21,8 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionStage
 import java.util.concurrent.atomic.AtomicReference
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 @Service
 @Transactional
@@ -49,9 +52,21 @@ class Neo4JExportServiceImpl(
             if (exportContext.state != Neo4JExportContextState.READY) {
                 throw Neo4JExportDownloadNotReadyException(uuid)
             }
-            // FIXME Zipping the context
             // Closes the context when done
             exportContext.close()
+            // Gets the list of paths
+            val paths = exportContext.paths
+            // Zips the directory
+            ZipOutputStream(stream).use { zout ->
+                paths.forEach { path ->
+                    zout.putNextEntry(ZipEntry(path))
+                    exportContext.open(path).use { input ->
+                        IOUtils.copy(input, zout)
+                    }
+                }
+            }
+            // Clean up
+            closeContext(exportContext)
         } else {
             throw Neo4JExportNoDownloadException()
         }
@@ -106,7 +121,9 @@ class Neo4JExportServiceImpl(
     }
 
     private fun export(exportContext: Neo4JExportContext, recordExtractors: List<Neo4JExportRecordExtractor<*>>) {
+        exportContext.start()
         recordExtractors.forEach { recordExtractor -> export(exportContext, recordExtractor) }
+        exportContext.ready()
     }
 
     /**
@@ -142,7 +159,7 @@ class Neo4JExportServiceImpl(
         exportContext.recordStat(recordDef.name, recordDef.type)
     }
 
-    private fun closeContext(ctx: Neo4JExportContext?): Neo4JExportContext? {
+    private fun closeContext(ctx: Neo4JExportContext?) {
         if (ctx != null) {
             ctx.close()
             val contextWorkingDir = getContextWorkingDir(ctx.uuid)
@@ -159,9 +176,7 @@ class Neo4JExportServiceImpl(
                                 .withDetail("neo4j.export.dir", contextWorkingDir.absolutePath)
                 )
             }
-
         }
-        return null
     }
 
     private fun createExportContext(id: String): Neo4JExportContext {
