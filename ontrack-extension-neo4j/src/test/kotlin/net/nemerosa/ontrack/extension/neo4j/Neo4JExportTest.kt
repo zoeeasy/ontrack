@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 /**
@@ -26,6 +27,73 @@ class Neo4JExportTest : AbstractDSLTestSupport() {
         asAdmin().execute {
             structureService.projectList.forEach {
                 structureService.deleteProject(it.id)
+            }
+        }
+    }
+
+    @Test(expected = Neo4JExportNoDownloadException::class)
+    fun `Downloading without any export`() {
+        val file = File.createTempFile("test", ".zip")
+        // Attempting to download anything
+        file.outputStream().use {
+            asAdmin().call {
+                neo4JExportService.download("Totally unknown UUID", it)
+            }
+        }
+    }
+
+    @Test(expected = Neo4JExportDownloadNotFoundException::class)
+    fun `Downloading an unknown UUID`() {
+        // Creates projects, branches, etc.
+        tx {
+            project {
+                branch("master") {}
+            }
+        }
+        // Launching the export and gets the answer
+        val response = asAdmin().call {
+            neo4JExportService.export(Neo4JExportRequest())
+                    .toCompletableFuture()
+                    .get(10, TimeUnit.SECONDS)
+        }
+        // Attempting to download another UUID
+        val file = File.createTempFile("test", ".zip")
+        file.outputStream().use {
+            asAdmin().call {
+                neo4JExportService.download("Totally unknown UUID", it)
+            }
+        }
+    }
+
+    @Test
+    fun `Cannot download twice`() {
+        // Creates projects, branches, etc.
+        tx {
+            project {
+                branch("master") {}
+            }
+        }
+        // Launching the export and gets the answer
+        val response = asAdmin().call {
+            neo4JExportService.export(Neo4JExportRequest())
+                    .toCompletableFuture()
+                    .get(10, TimeUnit.SECONDS)
+        }
+        // Downloads the result and unzips them on the go
+        val file = File.createTempFile("test", ".zip")
+        file.outputStream().use {
+            asAdmin().call {
+                neo4JExportService.download(response.uuid, it)
+            }
+        }
+        assertTrue(file.exists())
+        assertTrue(file.length() > 0)
+        // Downloads a second time
+        assertFailsWith(Neo4JExportNoDownloadException::class) {
+            file.outputStream().use {
+                asAdmin().call {
+                    neo4JExportService.download(response.uuid, it)
+                }
             }
         }
     }
@@ -62,11 +130,12 @@ class Neo4JExportTest : AbstractDSLTestSupport() {
         // Downloads the result and unzips them on the go
         val file = File.createTempFile("test", ".zip")
         file.outputStream().use {
-            neo4JExportService.download(response.uuid, it)
+            asAdmin().call {
+                neo4JExportService.download(response.uuid, it)
+            }
         }
         assertTrue(file.exists())
         assertTrue(file.length() > 0)
-        // TODO Unzipping into a directory
     }
 
 }
