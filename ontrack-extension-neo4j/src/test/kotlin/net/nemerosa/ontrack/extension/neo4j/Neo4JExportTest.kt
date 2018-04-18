@@ -152,6 +152,9 @@ class Neo4JExportTest : AbstractDSLTestSupport() {
                         FileUtils.copyInputStreamToFile(zin, targetFile)
                     }
                 }
+                // Running tests
+                val projectFile = File(dir, "node/Project.csv")
+                assertTrue(projectFile.exists(), "Project CSV file does exist.")
             } finally {
                 FileUtils.deleteDirectory(dir)
             }
