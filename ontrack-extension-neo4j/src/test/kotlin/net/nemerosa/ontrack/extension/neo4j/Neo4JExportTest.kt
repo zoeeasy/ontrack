@@ -101,7 +101,7 @@ class Neo4JExportTest : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun export() {
+    fun `Exporting and downloading`() {
         // Creates projects, branches, etc.
         tx {
             project {
@@ -130,11 +130,25 @@ class Neo4JExportTest : AbstractDSLTestSupport() {
             assertEquals(5, stats["rel/BRANCH_OF"])
         }
         // Downloads the result and unzips them on the go
+        download(response.uuid) { dir ->
+            csvTest(dir, "node/Project.csv") {
+
+            }
+        }
+    }
+
+    private fun csvTest(dir: File, path: String, code: () -> Unit) {
+        val csvFile = File(dir, path)
+        assertTrue(csvFile.exists(), "$path file does exist.")
+        code()
+    }
+
+    private fun download(uuid: String, code: (File) -> Unit) {
         val zip = File.createTempFile("test", ".zip")
         try {
             zip.outputStream().use {
                 asAdmin().call {
-                    neo4JExportService.download(response.uuid, it)
+                    neo4JExportService.download(uuid, it)
                 }
             }
             assertTrue(zip.exists())
@@ -152,9 +166,8 @@ class Neo4JExportTest : AbstractDSLTestSupport() {
                         FileUtils.copyInputStreamToFile(zin, targetFile)
                     }
                 }
-                // Running tests
-                val projectFile = File(dir, "node/Project.csv")
-                assertTrue(projectFile.exists(), "Project CSV file does exist.")
+                // Tests
+                code(dir)
             } finally {
                 FileUtils.deleteDirectory(dir)
             }
