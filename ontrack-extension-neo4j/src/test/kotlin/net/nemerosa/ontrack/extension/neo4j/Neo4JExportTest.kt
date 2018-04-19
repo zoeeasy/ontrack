@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.neo4j
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVRecord
 import org.apache.commons.io.FileUtils
 import org.junit.Before
 import org.junit.Test
@@ -129,18 +131,30 @@ class Neo4JExportTest : AbstractDSLTestSupport() {
             assertEquals(5, stats["node/Branch"])
             assertEquals(5, stats["rel/BRANCH_OF"])
         }
-        // Downloads the result and unzips them on the go
+        // Downloads and checks the results
         download(response.uuid) { dir ->
-            csvTest(dir, "node/Project.csv") {
-
+            csvTest(dir, "node/Project.csv") { _, record ->
+                val id: String? = record.get(":ID")
+                assertEquals("....1", id)
             }
         }
     }
 
-    private fun csvTest(dir: File, path: String, code: () -> Unit) {
+    private fun csvTest(dir: File, path: String, max: Int = 1, code: (Int, CSVRecord) -> Unit) {
         val csvFile = File(dir, path)
         assertTrue(csvFile.exists(), "$path file does exist.")
-        code()
+        csvFile.reader().use { reader ->
+            val csvParser = CSVFormat.RFC4180
+                    .withFirstRecordAsHeader()
+                    .parse(reader)
+                    .iterator()
+            var line = 0
+            while (line < max && csvParser.hasNext()) {
+                line++
+                val csvRecord: CSVRecord = csvParser.next()
+                code(line, csvRecord)
+            }
+        }
     }
 
     private fun download(uuid: String, code: (File) -> Unit) {

@@ -65,10 +65,8 @@ class NodeContext<T>(private val name: String) : AbstractGraphContext<T>() {
         column(":LABEL" to { _ -> name })
     }
 
-    private var id: (T) -> Any = { throw IllegalStateException("ID provider not implemented for node $name") }
-
     fun id(idProvider: (T) -> Any) {
-        this.id = idProvider
+        column(":ID" to idProvider)
     }
 
     override fun getRecordDef() = Neo4JExportRecordDef(

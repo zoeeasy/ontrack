@@ -6,6 +6,7 @@ dependencies {
     compile project(':ontrack-extension-support')
 
     testCompile project(':ontrack-it-utils')
+    testCompile 'org.apache.commons:commons-csv:1.5'
 
     testRuntime project(':ontrack-service')
     testRuntime project(':ontrack-repository-impl')
