@@ -105,16 +105,17 @@ class Neo4JExportTest : AbstractDSLTestSupport() {
     @Test
     fun `Exporting and downloading`() {
         // Creates projects, branches, etc.
-        tx {
-            project {
+        val (a, _) = tx {
+            val a = project {
                 branch("master") {}
                 branch("release/2.0") {}
                 branch("hotfix/456-aie") {}
             }
-            project {
+            val b = project {
                 branch("release/1.0") {}
                 branch("feature/123-great") {}
             }
+            a to b
         }
         // Launching the export and gets the answer
         val response = asAdmin().call {
@@ -135,7 +136,7 @@ class Neo4JExportTest : AbstractDSLTestSupport() {
         download(response.uuid) { dir ->
             csvTest(dir, "node/Project.csv") { _, record ->
                 val id: String? = record.get(":ID")
-                assertEquals("....1", id)
+                assertEquals("00000000-0000-0000-0001-${"%012d".format(a.id())}", id)
             }
         }
     }

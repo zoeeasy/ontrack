@@ -51,12 +51,12 @@ public abstract class AbstractITTestSupport extends AbstractTransactionalJUnit4S
     @Autowired
     protected PlatformTransactionManager platformTransactionManager;
 
-    protected <T> void tx(Callable<T> callable) {
+    protected <T> T tx(Callable<T> callable) {
         TransactionTemplate txTemplate = new TransactionTemplate(
                 platformTransactionManager,
                 new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_REQUIRES_NEW)
         );
-        txTemplate.execute(status -> {
+        return txTemplate.execute(status -> {
             try {
                 return callable.call();
             } catch (Exception e) {

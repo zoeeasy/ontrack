@@ -15,7 +15,7 @@ class EntitiesNeo4JExportModule(
         extractor<Project> {
             records { structureService.projectList.asSequence() }
             node("Project") {
-                id(Project::id)
+                id(entityId())
                 column("name" to Project::getName)
                 column("description" to Project::getDescription)
                 column("disabled" to Project::isDisabled)
