@@ -65,7 +65,7 @@ class NodeContext<T>(private val name: String) : AbstractGraphContext<T>() {
         column(":LABEL" to { _ -> name })
     }
 
-    fun id(idProvider: (T) -> Any) {
+    fun id(idProvider: (T) -> String) {
         column(":ID" to idProvider)
     }
 
@@ -83,11 +83,11 @@ class RelContext<T>(private val name: String) : AbstractGraphContext<T>() {
         column(":TYPE" to { _ -> name })
     }
 
-    fun start(field: (T) -> Any) {
+    fun start(field: (T) -> String) {
         column(":START_ID" to field)
     }
 
-    fun end(field: (T) -> Any) {
+    fun end(field: (T) -> String) {
         column(":END_ID" to field)
     }
 

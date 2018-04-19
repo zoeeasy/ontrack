@@ -26,7 +26,7 @@ class EntitiesNeo4JExportModule(
         extractor<Branch> {
             records { structureService.projectList.asSequence().flatMap { structureService.getBranchesForProject(it.id).asSequence() } }
             node("Branch") {
-                id(Branch::id)
+                id(entityId())
                 column("name" to Branch::getName)
                 column("description" to Branch::getDescription)
                 column("disabled" to Branch::isDisabled)
@@ -34,8 +34,8 @@ class EntitiesNeo4JExportModule(
                 // TODO creation
             }
             rel("BRANCH_OF") {
-                start(Branch::id)
-                end { it.project.id() }
+                start(entityId())
+                end(entityId<Branch, Project> { t -> t.project })
             }
         }
     }

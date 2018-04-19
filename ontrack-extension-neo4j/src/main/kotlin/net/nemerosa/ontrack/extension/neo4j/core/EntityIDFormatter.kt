@@ -9,10 +9,21 @@ val ids = mapOf(
         Branch::class to 2
 )
 
+const val ENTITY_PSEUDO_UUID = "00000000-0000-0000-%04d-%012d"
+
 inline fun <reified T : ProjectEntity> entityId(): (T) -> String {
     val typeId = ids[T::class] ?: throw IllegalArgumentException("Project entity not managed: ${T::class}")
     return { t ->
         val id = t.id()
-        "00000000-0000-0000-%04d-%012d".format(typeId, id)
+        ENTITY_PSEUDO_UUID.format(typeId, id)
+    }
+}
+
+inline fun <reified T : ProjectEntity, reified U : ProjectEntity> entityId(crossinline fn: (T) -> U): (T) -> String {
+    val typeId = ids[T::class] ?: throw IllegalArgumentException("Project entity not managed: ${T::class}")
+    return { t ->
+        val u = fn(t)
+        val id = u.id()
+        ENTITY_PSEUDO_UUID.format(typeId, id)
     }
 }
