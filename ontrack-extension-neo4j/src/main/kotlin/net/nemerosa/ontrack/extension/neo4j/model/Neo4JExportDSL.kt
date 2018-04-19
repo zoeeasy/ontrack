@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.extension.neo4j.model
 
+import net.nemerosa.ontrack.extension.neo4j.core.entityId
+import net.nemerosa.ontrack.model.structure.ProjectEntity
+
 fun extractors(code: ExtractorsContext.() -> Unit): List<Neo4JExportRecordExtractor<*>> {
     return ExtractorsContext()
             .apply { code() }
@@ -44,6 +47,13 @@ class ExtractorContext<T> {
             items,
             recordDefinitions.toList()
     )
+}
+
+inline fun <reified T : ProjectEntity, reified U : ProjectEntity> ExtractorContext<T>.rel(name: String, crossinline to: (T) -> U) {
+    rel(name) {
+        start(entityId())
+        end(entityId(to))
+    }
 }
 
 abstract class AbstractGraphContext<T> {

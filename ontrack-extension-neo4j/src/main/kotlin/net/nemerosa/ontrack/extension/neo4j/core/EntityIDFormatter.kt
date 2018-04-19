@@ -20,7 +20,7 @@ inline fun <reified T : ProjectEntity> entityId(): (T) -> String {
 }
 
 inline fun <reified T : ProjectEntity, reified U : ProjectEntity> entityId(crossinline fn: (T) -> U): (T) -> String {
-    val typeId = ids[T::class] ?: throw IllegalArgumentException("Project entity not managed: ${T::class}")
+    val typeId = ids[U::class] ?: throw IllegalArgumentException("Project entity not managed: ${U::class}")
     return { t ->
         val u = fn(t)
         val id = u.id()

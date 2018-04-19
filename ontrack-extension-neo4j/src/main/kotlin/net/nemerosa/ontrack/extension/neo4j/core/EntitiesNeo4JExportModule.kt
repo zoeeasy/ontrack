@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.neo4j.core
 
 import net.nemerosa.ontrack.extension.neo4j.model.Neo4JExportModule
 import net.nemerosa.ontrack.extension.neo4j.model.extractors
+import net.nemerosa.ontrack.extension.neo4j.model.rel
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -33,10 +34,7 @@ class EntitiesNeo4JExportModule(
                 // TODO creator
                 // TODO creation
             }
-            rel("BRANCH_OF") {
-                start(entityId())
-                end(entityId<Branch, Project> { t -> t.project })
-            }
+            rel("BRANCH_OF", { b -> b.project })
         }
     }
 }
