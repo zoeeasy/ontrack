@@ -3,6 +3,7 @@ apply plugin: 'groovy'
 dependencies {
     compile project(':ontrack-model')
     compile project(':ontrack-repository')
+    compile project(':ontrack-repository-jpa')
     compile project(':ontrack-extension-api')
     compile project(':ontrack-job')
     compile 'org.springframework:spring-context'
